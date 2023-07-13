@@ -1,17 +1,6 @@
 import React, { createContext, useReducer } from "react";
 import data from "./data.json";
 
-// const fetchMoviesData = async () => {
-//   debugger;
-//   try {
-//     const response = await fetch("./data.json");
-//     const data = await response.json();
-//     return data.movies; // Assuming the JSON structure has a 'movies' property
-//   } catch (error) {
-//     console.error("Error fetching movies data:", error);
-//     return []; // Return an empty array as the default data in case of an error
-//   }
-// };
 const initialState = {
   movies: data,
   searchTypes: [

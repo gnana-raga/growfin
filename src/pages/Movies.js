@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Col, Row, Space } from "antd";
+import { Col, Row } from "antd";
 import { MovieCard, SelectMenu, InputQuery, AlertMessage } from "../components";
 import {
   MovieContext,
@@ -20,17 +20,14 @@ export default function Movies() {
     if (event.target.value == "") {
       dispatch(getAllMovies());
     }
-    // dispatch({ type: "SET_INPUT_TEXT", payload: event.target.value });
   };
 
   const handleMenuChange = (value) => {
     dispatch(setSearchType(value));
-    // dispatch({ type: "SET_SEARCH_TYPE", payload: value });
   };
 
   const handleAlertClose = () => {
     dispatch(getAllMovies());
-    // dispatch({ type: "GET_ALL_MOVIES" });
   };
 
   const handleMoviesFilter = (convertedObject) => {
@@ -38,8 +35,6 @@ export default function Movies() {
     const filteredMovies = movies.filter((movie) => {
       for (const key in convertedObject) {
         const capitalizedStr = key.charAt(0).toUpperCase() + key.slice(1);
-        console.log("movie[key]", movie[key]);
-        console.log("convertedObject[key]", convertedObject[key]);
         if (
           movie[key] != convertedObject[key] ||
           movie[capitalizedStr] != convertedObject[key]
