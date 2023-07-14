@@ -10,10 +10,16 @@ import {
   setSearchType,
 } from "../context";
 import { convertQueryToObject, convertQueryToRank } from "../utils/query";
+import _ from "lodash";
+
+const searchTypes = [
+  { value: "get:", label: "get" },
+  { value: "rank:", label: "rank" },
+];
 
 export default function Movies() {
   const { state, dispatch } = useContext(MovieContext);
-  const { movies, searchType, searchTypes, isQueryError, errorMessage } = state;
+  const { movies, searchType, isQueryError, errorMessage, inputText } = state;
 
   const handleInputChange = (event) => {
     dispatch(setInputText(event.target.value));
@@ -34,11 +40,12 @@ export default function Movies() {
     dispatch(getAllMovies());
     const filteredMovies = movies.filter((movie) => {
       for (const key in convertedObject) {
-        const capitalizedStr = key.charAt(0).toUpperCase() + key.slice(1);
         if (
-          movie[key] != convertedObject[key] ||
-          movie[capitalizedStr] != convertedObject[key]
+          isNaN(convertedObject[key]) &&
+          !movie[key].toLowerCase().includes(convertedObject[key].toLowerCase())
         ) {
+          return false;
+        } else if (movie[key] != convertedObject[key]) {
           return false;
         }
       }
@@ -50,26 +57,14 @@ export default function Movies() {
 
   const handleMoviesSort = (convertedObject) => {
     dispatch(getAllMovies());
-    const sortedObject = convertedObject.sort((a, b) => {
-      const rankA = parseInt(a.rank);
-      const rankB = parseInt(b.rank);
-      if (isNaN(rankA) || isNaN(rankB)) {
-        return isNaN(rankA) ? 1 : -1;
-      }
-      return rankA - rankB;
-    });
-    const sortedMovies = [];
-    sortedObject.forEach((params) =>
-      movies.map((movie) => {
-        if (movie.Title == params.title) {
-          sortedMovies.push(movie);
-        }
-      })
-    );
-    movies.forEach((movie) => {
-      const found = sortedMovies.some((objA) => objA.Title === movie.Title);
-      if (!found) {
-        sortedMovies.push(movie);
+    const sortedMovies = [...movies];
+    convertedObject.forEach(({ title, rank }) => {
+      const movieIndex = sortedMovies.findIndex(
+        (movie) => movie.Title === title
+      );
+      if (movieIndex !== -1) {
+        const [movie] = sortedMovies.splice(movieIndex, 1);
+        sortedMovies.splice(rank - 1, 0, movie);
       }
     });
     return sortedMovies;
@@ -109,7 +104,24 @@ export default function Movies() {
             addOn={searchType}
             setInputText={handleInputChange}
             onKeyPress={handleKeyDown}
+            value={inputText}
           />
+        </Col>
+        <Col span={12}>
+          {searchType === "get:" ? (
+            <AlertMessage
+              type="warning"
+              message={"Type the Query as per this format `Year=2019`"}
+            />
+          ) : (
+            <AlertMessage
+              type="warning"
+              message={
+                "Type the Query as per this format `title='Knives Out'&rank=1&title='They Shall Not Grow Old'&rank=2`"
+              }
+              desc={""}
+            />
+          )}
         </Col>
       </Row>
       {isQueryError && (

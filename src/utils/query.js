@@ -17,19 +17,27 @@ export const convertQueryToRank = (string) => {
   if (!matches) {
     return null;
   }
-  const pairs = string.split("&");
-  const data = [];
-  pairs.forEach((pair) => {
-    const [key, value] = pair.split("=");
-    const cleanedValue = value.replace(/'/g, "");
-    const existingObjIndex = data.findIndex((obj) => obj.title === key);
 
-    if (existingObjIndex !== -1) {
-      data[existingObjIndex].rank = cleanedValue;
-    } else {
-      data.push({ title: cleanedValue, rank: "" });
+  const cleanedString = string.replace(/'/g, "");
+
+  const pairs = cleanedString.split("&");
+
+  const result = [];
+  for (let i = 0; i < pairs.length; i += 2) {
+    const title = pairs[i].split("=")[1];
+    const rank = pairs[i + 1].split("=")[1];
+    result.push({ title, rank: parseInt(rank) });
+  }
+  return result;
+};
+
+export const objectCreator = (obj, keyArray) => {
+  let newObj = {};
+
+  for (var i = 0; i < keyArray.length; i++) {
+    if (obj[keyArray[i]]) {
+      newObj[keyArray[i]] = obj[keyArray[i]];
     }
-  });
-
-  return data;
+  }
+  return newObj;
 };

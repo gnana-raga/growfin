@@ -3,10 +3,6 @@ import data from "./data.json";
 
 const initialState = {
   movies: data,
-  searchTypes: [
-    { value: "get:", label: "get" },
-    { value: "rank:", label: "rank" },
-  ],
   inputText: "",
   searchType: "get:",
   isQueryError: false,
